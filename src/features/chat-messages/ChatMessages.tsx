@@ -11,8 +11,16 @@ interface ChatMessagesProps {
 export function ChatMessages({ messages }: ChatMessagesProps): ReactNode {
   const containerRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const firstMatchRef = useRef<HTMLDivElement>(null)
   const isStreaming = useChatStore((s) => s.isStreaming)
+  const searchQuery = useChatStore((s) => s.searchQuery)
   const lastContent = messages.at(-1)?.content
+
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const firstMatchedId =
+    normalizedQuery.length > 0
+      ? messages.find((m) => m.content.toLowerCase().includes(normalizedQuery))?.id ?? null
+      : null
 
   useEffect(() => {
     const container = containerRef.current
@@ -29,6 +37,11 @@ export function ChatMessages({ messages }: ChatMessagesProps): ReactNode {
     }
   }, [messages.length, lastContent, isStreaming])
 
+  useEffect(() => {
+    if (!normalizedQuery) return
+    firstMatchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [normalizedQuery, firstMatchedId])
+
   return (
     <div
       ref={containerRef}
@@ -40,12 +53,20 @@ export function ChatMessages({ messages }: ChatMessagesProps): ReactNode {
             m.role === 'assistant' && i === messages.length - 1
           const isStreamingAssistant =
             Boolean(isStreaming && isLastAssistant && !m.content.trim())
+          const isSearchMatch =
+            normalizedQuery.length > 0 &&
+            m.content.toLowerCase().includes(normalizedQuery)
           return (
-            <MessageBubble
+            <div
               key={m.id}
-              message={m}
-              isStreamingAssistant={isStreamingAssistant}
-            />
+              ref={m.id === firstMatchedId ? firstMatchRef : undefined}
+            >
+              <MessageBubble
+                message={m}
+                isStreamingAssistant={isStreamingAssistant}
+                isSearchMatch={isSearchMatch}
+              />
+            </div>
           )
         })}
         <div

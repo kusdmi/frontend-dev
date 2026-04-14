@@ -7,11 +7,13 @@ import type { ChatMessage } from '@/entities/chat/types'
 interface MessageBubbleProps {
   message: ChatMessage
   isStreamingAssistant: boolean
+  isSearchMatch?: boolean
 }
 
 export function MessageBubble({
   message,
   isStreamingAssistant,
+  isSearchMatch = false,
 }: MessageBubbleProps): ReactNode {
   const isUser = message.role === 'user'
   const rowClassName = isUser ? 'justify-end' : 'justify-start'
@@ -44,7 +46,11 @@ export function MessageBubble({
       >
         {isUser ? (
           <div className="space-y-1">
-            <div className="rounded-2xl bg-[#ececec] px-3 py-2 whitespace-pre-wrap text-[14px] leading-relaxed sm:px-4">
+            <div
+              className={`rounded-2xl bg-[#ececec] px-3 py-2 whitespace-pre-wrap text-[14px] leading-relaxed sm:px-4 ${
+                isSearchMatch ? 'ring-2 ring-zinc-300' : ''
+              }`}
+            >
               {message.images?.map((img) => (
                 <img
                   key={img.dataUrl.slice(0, 80)}
@@ -75,7 +81,7 @@ export function MessageBubble({
             </div>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className={`space-y-1 ${isSearchMatch ? 'rounded-lg ring-2 ring-zinc-300' : ''}`}>
             {isStreamingAssistant && !message.content.trim() ? (
               <TypingIndicator />
             ) : (

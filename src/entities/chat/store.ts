@@ -320,10 +320,21 @@ export function getFilteredChats(
   chats: ChatSession[],
   query: string
 ): ChatSession[] {
-  const q = query.trim().toLowerCase()
+  const normalize = (value: string): string =>
+    value
+      .toLowerCase()
+      .replace(/[`*_#>\[\]\(\)!~\-+|]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+
+  const q = normalize(query)
   if (!q) return chats
+
   return chats.filter((c) => {
-    if (c.title.toLowerCase().includes(q)) return true
-    return c.messages.some((m) => m.content.toLowerCase().includes(q))
+    const titleText = normalize(c.title)
+    if (titleText.includes(q)) return true
+
+    const messagesText = normalize(c.messages.map((m) => m.content).join(' '))
+    return messagesText.includes(q)
   })
 }

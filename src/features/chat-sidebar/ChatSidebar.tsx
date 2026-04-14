@@ -13,6 +13,43 @@ interface ChatSidebarProps {
   onCloseMobile?: () => void
 }
 
+function getMatchSnippet(
+  title: string,
+  messagesText: string,
+  query: string,
+  maxLen = 80
+): string {
+  const q = query.trim().toLowerCase()
+  if (!q) return ''
+  const source = `${title} ${messagesText}`.replace(/\s+/g, ' ').trim()
+  if (!source) return ''
+  const sourceLower = source.toLowerCase()
+  const idx = sourceLower.indexOf(q)
+  if (idx < 0) return source.slice(0, maxLen)
+
+  const start = Math.max(0, idx - 20)
+  const end = Math.min(source.length, idx + q.length + 40)
+  const raw = source.slice(start, end)
+  return `${start > 0 ? '…' : ''}${raw}${end < source.length ? '…' : ''}`
+}
+
+function renderHighlightedSnippet(snippet: string, query: string): ReactNode {
+  const q = query.trim()
+  if (!q || !snippet) return snippet
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const re = new RegExp(`(${escaped})`, 'gi')
+  const parts = snippet.split(re)
+  return parts.map((part, i) =>
+    part.toLowerCase() === q.toLowerCase() ? (
+      <mark key={`${part}-${i}`} className="rounded bg-yellow-200/80 px-0.5 text-zinc-900">
+        {part}
+      </mark>
+    ) : (
+      <span key={`${part}-${i}`}>{part}</span>
+    )
+  )
+}
+
 export function ChatSidebar({
   onOpenSettings,
   onChatSelected,
@@ -155,9 +192,23 @@ export function ChatSidebar({
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
-                          <span className="line-clamp-2 text-[14px] font-medium text-zinc-800">
-                            {c.title}
-                          </span>
+                          <div className="min-w-0">
+                            <span className="line-clamp-2 text-[14px] font-medium text-zinc-800">
+                              {c.title}
+                            </span>
+                            {searchQuery.trim() && (
+                              <p className="mt-1 line-clamp-2 text-xs text-zinc-500">
+                                {renderHighlightedSnippet(
+                                  getMatchSnippet(
+                                    c.title,
+                                    c.messages.map((m) => m.content).join(' '),
+                                    searchQuery
+                                  ),
+                                  searchQuery
+                                )}
+                              </p>
+                            )}
+                          </div>
                         )}
                       </button>
                     </div>
