@@ -13,6 +13,7 @@ export function ChatLayout(): ReactNode {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const hydrated = useChatStore((s) => s.hydrated)
   const sidebarOpen = useChatStore((s) => s.sidebarOpen)
+  const setSidebarOpen = useChatStore((s) => s.setSidebarOpen)
   const lastError = useChatStore((s) => s.lastError)
   const theme = useChatStore((s) => s.settings.theme)
   const currentChat = useChatStore((s) =>
@@ -40,17 +41,50 @@ export function ChatLayout(): ReactNode {
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[#f7f7f8] md:flex-row">
-      <div
-        className={`${
-          sidebarOpen ? 'flex' : 'hidden'
-        } min-h-0 md:flex md:min-h-0`}
-      >
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-black/30 md:hidden"
+          aria-label="Закрыть боковую панель"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {sidebarOpen && (
+        <div className="fixed inset-y-0 left-0 z-40 min-h-0 md:hidden">
+          <div className="h-full">
+            <ErrorBoundary>
+              <ChatSidebar
+                onOpenSettings={() => setSettingsOpen(true)}
+                mobileMode
+                onCloseMobile={() => setSidebarOpen(false)}
+                onChatSelected={() => setSidebarOpen(false)}
+              />
+            </ErrorBoundary>
+          </div>
+        </div>
+      )}
+
+      <div className="hidden min-h-0 md:flex md:min-h-0">
         <ErrorBoundary>
           <ChatSidebar onOpenSettings={() => setSettingsOpen(true)} />
         </ErrorBoundary>
       </div>
 
       <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-white">
+        <div className="z-20 flex items-center justify-between px-3 pb-1 pt-3 md:hidden">
+          <button
+            type="button"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-lg leading-none text-zinc-700 hover:bg-zinc-100"
+            aria-label="Открыть боковую панель"
+            onClick={() => setSidebarOpen(true)}
+          >
+            ☰
+          </button>
+          <span className="text-[14px] font-medium text-zinc-800">GigaChat</span>
+          <div className="h-8 w-8" />
+        </div>
+
         <div className="pointer-events-none absolute left-6 top-4 z-20 hidden sm:block">
           <span className="pointer-events-auto text-[14px] font-medium text-zinc-800">
             GigaChat

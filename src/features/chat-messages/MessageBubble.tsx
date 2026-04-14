@@ -38,13 +38,13 @@ export function MessageBubble({
       <div
         className={`${
           isUser
-            ? 'ml-auto w-fit max-w-[70%] text-black'
-            : 'w-full pl-[10px] pr-0 py-0 text-black'
+            ? 'ml-auto w-fit max-w-[85%] text-black sm:max-w-[70%]'
+            : 'w-full pl-1 pr-0 py-0 text-black sm:pl-[10px]'
         }`}
       >
         {isUser ? (
           <div className="space-y-1">
-            <div className="rounded-2xl bg-[#ececec] px-4 py-2 whitespace-pre-wrap text-[14px] leading-relaxed">
+            <div className="rounded-2xl bg-[#ececec] px-3 py-2 whitespace-pre-wrap text-[14px] leading-relaxed sm:px-4">
               {message.images?.map((img) => (
                 <img
                   key={img.dataUrl.slice(0, 80)}

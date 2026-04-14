@@ -8,9 +8,17 @@ import { Modal } from '@/shared/ui/Modal'
 
 interface ChatSidebarProps {
   onOpenSettings: () => void
+  onChatSelected?: () => void
+  mobileMode?: boolean
+  onCloseMobile?: () => void
 }
 
-export function ChatSidebar({ onOpenSettings }: ChatSidebarProps): ReactNode {
+export function ChatSidebar({
+  onOpenSettings,
+  onChatSelected,
+  mobileMode = false,
+  onCloseMobile,
+}: ChatSidebarProps): ReactNode {
   const chats = useChatStore((s) => s.chats)
   const currentChatId = useChatStore((s) => s.currentChatId)
   const searchQuery = useChatStore((s) => s.searchQuery)
@@ -49,21 +57,37 @@ export function ChatSidebar({ onOpenSettings }: ChatSidebarProps): ReactNode {
       <aside
         className={clsx(
           'flex h-full shrink-0 flex-col border-r border-zinc-200 bg-[#f2f3f5] transition-all',
-          compact ? 'w-[68px]' : 'w-[260px]'
+          mobileMode
+            ? 'w-[82vw] max-w-[280px]'
+            : compact
+              ? 'w-[68px]'
+              : 'w-[82vw] max-w-[280px] md:w-[260px] md:max-w-[260px]'
         )}
       >
         <div className="flex items-center justify-end px-3 pt-3">
           <button
             type="button"
             className="inline-flex h-8 w-8 items-center justify-center rounded-md text-lg leading-none text-zinc-700 hover:bg-zinc-200"
-            aria-label={compact ? 'Развернуть меню' : 'Свернуть меню'}
-            onClick={() => setCompact((v) => !v)}
+            aria-label={
+              mobileMode
+                ? 'Закрыть меню'
+                : compact
+                  ? 'Развернуть меню'
+                  : 'Свернуть меню'
+            }
+            onClick={() => {
+              if (mobileMode) {
+                onCloseMobile?.()
+                return
+              }
+              setCompact((v) => !v)
+            }}
           >
-            {compact ? '»' : '«'}
+            {mobileMode ? '×' : compact ? '»' : '«'}
           </button>
         </div>
 
-        {!compact && (
+        {(!compact || mobileMode) && (
           <>
             <div className="px-3 pb-3 pt-1">
               <input
@@ -78,6 +102,7 @@ export function ChatSidebar({ onOpenSettings }: ChatSidebarProps): ReactNode {
                 className="mt-2 w-full rounded-xl border-0 bg-transparent px-4 py-2.5 text-left text-sm font-medium text-zinc-800 shadow-none outline-none ring-0 hover:bg-[#e4e7ef] focus:outline-none focus:ring-0"
                 onClick={() => {
                   createChat()
+                  onChatSelected?.()
                 }}
               >
                 Новый чат
@@ -105,7 +130,10 @@ export function ChatSidebar({ onOpenSettings }: ChatSidebarProps): ReactNode {
                       <button
                         type="button"
                         className="min-w-0 flex-1 text-left"
-                        onClick={() => selectChat(c.id)}
+                        onClick={() => {
+                          selectChat(c.id)
+                          onChatSelected?.()
+                        }}
                       >
                         {editingId === c.id ? (
                           <input

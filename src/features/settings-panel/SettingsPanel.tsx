@@ -30,9 +30,9 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps): ReactNode 
         aria-label="Закрыть настройки"
         onClick={onClose}
       />
-      <div className="relative z-10 w-[min(92vw,700px)] overflow-hidden rounded-2xl border border-zinc-200 bg-[#f7f7f8] shadow-2xl">
-        <div className="flex h-[320px]">
-          <div className="w-[220px] shrink-0 border-r border-zinc-200 bg-[#f5f5f6] p-3">
+      <div className="relative z-10 w-[min(94vw,700px)] overflow-hidden rounded-2xl border border-zinc-200 bg-[#f7f7f8] shadow-2xl">
+        <div className="flex h-[min(82vh,520px)] flex-col sm:h-[420px] sm:flex-row">
+          <div className="w-full shrink-0 border-b border-zinc-200 bg-[#f5f5f6] p-3 sm:w-[220px] sm:border-b-0 sm:border-r">
             <button
               type="button"
               className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-md text-lg text-zinc-700 hover:bg-zinc-200"
@@ -51,7 +51,7 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps): ReactNode 
             </div>
           </div>
 
-          <div className="min-w-0 flex-1 overflow-y-auto bg-[#f7f7f8]">
+          <div className="min-h-0 min-w-0 flex-1 overflow-y-auto bg-[#f7f7f8]">
             <div className="border-b border-zinc-200 px-5 py-3 text-[16px] font-medium text-zinc-900">
               Общее
             </div>

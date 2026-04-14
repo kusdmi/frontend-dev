@@ -103,10 +103,10 @@ export function ChatInput(): ReactNode {
   }, [isStreaming])
 
   return (
-    <div className="shrink-0 !bg-transparent px-4 pb-4 pt-2">
+    <div className="shrink-0 !bg-transparent px-2 pb-3 pt-2 sm:px-4 sm:pb-4">
       <form
         onSubmit={onSubmit}
-        className="mx-auto flex w-full max-w-[864px] items-center gap-3 rounded-[30px] border border-zinc-200 !bg-white px-4 py-3 shadow-sm"
+        className="mx-auto flex w-full max-w-[864px] items-center gap-2 rounded-[24px] border border-zinc-200 !bg-white px-3 py-2.5 shadow-sm sm:gap-3 sm:rounded-[30px] sm:px-4 sm:py-3"
       >
         <input
           ref={fileRef}
@@ -120,7 +120,7 @@ export function ChatInput(): ReactNode {
           type="button"
           onClick={() => fileRef.current?.click()}
           disabled={isStreaming}
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[34px] leading-none text-zinc-700 hover:bg-zinc-100 disabled:opacity-40"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[30px] leading-none text-zinc-700 hover:bg-zinc-100 disabled:opacity-40 sm:text-[34px]"
           aria-label="Прикрепить изображение"
         >
           <span className="relative -top-px leading-none">+</span>
@@ -170,7 +170,7 @@ export function ChatInput(): ReactNode {
               placeholder="Спросите GigaGPT"
               rows={1}
               disabled={isStreaming}
-              className="h-8 max-h-32 min-h-0 w-full resize-none border-0 !bg-white px-0 py-0 text-[14px] leading-8 text-zinc-900 placeholder:text-zinc-400 focus:outline-none disabled:opacity-50"
+              className="h-8 max-h-32 min-h-0 w-full resize-none border-0 !bg-white px-0 py-0 text-[13px] leading-8 text-zinc-900 placeholder:text-zinc-400 focus:outline-none disabled:opacity-50 sm:text-[14px]"
             />
           </div>
         </div>
@@ -186,7 +186,7 @@ export function ChatInput(): ReactNode {
         ) : (
           <button
             type="submit"
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-black bg-black p-0 text-[24px] text-white hover:bg-black disabled:border-black disabled:bg-black disabled:text-white"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-black bg-black p-0 text-[22px] text-white hover:bg-black disabled:border-black disabled:bg-black disabled:text-white sm:h-10 sm:w-10 sm:text-[24px]"
             disabled={!value.trim() && images.length === 0}
             aria-label="Отправить сообщение"
           >

@@ -30,7 +30,10 @@ export function ChatMessages({ messages }: ChatMessagesProps): ReactNode {
   }, [messages.length, lastContent, isStreaming])
 
   return (
-    <div ref={containerRef} className="h-full overflow-y-auto px-4 pb-40 pt-4">
+    <div
+      ref={containerRef}
+      className="h-full overflow-y-auto px-2 pb-36 pt-2 sm:px-4 sm:pb-40 sm:pt-4"
+    >
       <div className="flex flex-col gap-5">
         {messages.map((m, i) => {
           const isLastAssistant =
@@ -47,7 +50,7 @@ export function ChatMessages({ messages }: ChatMessagesProps): ReactNode {
         })}
         <div
           ref={bottomRef}
-          className="h-px shrink-0 scroll-mb-32 md:scroll-mb-40"
+          className="h-px shrink-0 scroll-mb-28 sm:scroll-mb-32 md:scroll-mb-40"
           aria-hidden
         />
       </div>
