@@ -95,6 +95,13 @@ export function ChatInput(): ReactNode {
       )
   }, [])
 
+  useEffect(() => {
+    if (isStreaming) return
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus()
+    })
+  }, [isStreaming])
+
   return (
     <div className="shrink-0 !bg-transparent px-4 pb-4 pt-2">
       <form
@@ -116,7 +123,7 @@ export function ChatInput(): ReactNode {
           className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[34px] leading-none text-zinc-700 hover:bg-zinc-100 disabled:opacity-40"
           aria-label="Прикрепить изображение"
         >
-          +
+          <span className="relative -top-px leading-none">+</span>
         </button>
 
         <div className="flex min-w-0 flex-1 items-center !bg-white">
