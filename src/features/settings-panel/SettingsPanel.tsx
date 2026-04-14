@@ -8,7 +8,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ open, onClose }: SettingsPanelProps): ReactNode {
-  const theme = useChatStore((s) => s.settings.theme)
+  const settings = useChatStore((s) => s.settings)
   const setSettings = useChatStore((s) => s.setSettings)
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps): ReactNode 
                 <label className="shrink-0">
                   <span className="sr-only">Выбрать тему</span>
                   <select
-                    value={theme}
+                    value={settings.theme}
                     onChange={(e) =>
                       setSettings({
                         theme: e.target.value as 'system' | 'light' | 'dark',
@@ -80,6 +80,62 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps): ReactNode 
                 <span className="max-w-[65%] truncate text-right text-[13px] text-zinc-900">
                   Автоматически определять ▾
                 </span>
+              </div>
+              <div className="flex items-center justify-between gap-4 border-b border-zinc-200 px-5 py-4">
+                <span className="text-[13px] text-zinc-900">Temperature</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  value={settings.temperature}
+                  onChange={(e) =>
+                    setSettings({ temperature: Number(e.target.value) || 0 })
+                  }
+                  className="w-24 rounded-md border border-zinc-300 bg-white px-2 py-1 text-right text-[13px] text-zinc-900 outline-none"
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4 border-b border-zinc-200 px-5 py-4">
+                <span className="text-[13px] text-zinc-900">Top P</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  value={settings.topP}
+                  onChange={(e) => setSettings({ topP: Number(e.target.value) || 0 })}
+                  className="w-24 rounded-md border border-zinc-300 bg-white px-2 py-1 text-right text-[13px] text-zinc-900 outline-none"
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4 border-b border-zinc-200 px-5 py-4">
+                <span className="text-[13px] text-zinc-900">Max tokens</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={8192}
+                  step={1}
+                  value={settings.maxTokens}
+                  onChange={(e) =>
+                    setSettings({ maxTokens: Number(e.target.value) || 1 })
+                  }
+                  className="w-24 rounded-md border border-zinc-300 bg-white px-2 py-1 text-right text-[13px] text-zinc-900 outline-none"
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4 px-5 py-4">
+                <span className="text-[13px] text-zinc-900">Repetition penalty</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  value={settings.repetitionPenalty}
+                  onChange={(e) =>
+                    setSettings({
+                      repetitionPenalty: Number(e.target.value) || 0,
+                    })
+                  }
+                  className="w-24 rounded-md border border-zinc-300 bg-white px-2 py-1 text-right text-[13px] text-zinc-900 outline-none"
+                />
               </div>
             </div>
           </div>

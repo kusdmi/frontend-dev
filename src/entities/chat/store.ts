@@ -6,7 +6,7 @@ import { titleFromFirstMessage } from '@/shared/lib/titleFromMessage'
 import {
   fetchModels,
   getAccessToken,
-  streamChatCompletionTokens,
+  streamChatCompletionTokensWithFallback,
   uploadImageAsFile,
 } from '@/shared/api/gigachat'
 import type { ChatMessagePayload } from '@/shared/api/gigachat'
@@ -260,7 +260,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       )
 
       let acc = ''
-      for await (const chunk of streamChatCompletionTokens(
+      for await (const chunk of streamChatCompletionTokensWithFallback(
         token,
         {
           model: modelForRequest,
