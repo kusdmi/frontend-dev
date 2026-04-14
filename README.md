@@ -109,4 +109,3 @@ npm run preview
 - `src/features` — функциональные модули (ввод, сообщения, sidebar, настройки)
 - `src/shared` — API-слой, утилиты, UI-компоненты
 - `src/widgets` — композиция экранов
-# frontend-dev

@@ -10,6 +10,7 @@ export type ChatContent =
 export interface ChatMessagePayload {
   role: MessageRole
   content: ChatContent
+  attachments?: string[]
 }
 
 export interface ChatCompletionRequest {

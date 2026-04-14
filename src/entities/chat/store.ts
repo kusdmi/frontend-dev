@@ -2,11 +2,12 @@ import { nanoid } from 'nanoid'
 import { create } from 'zustand'
 
 import type { ChatMessage, ChatSession, ChatSettings } from './types'
-import { buildUserContent } from './types'
 import { titleFromFirstMessage } from '@/shared/lib/titleFromMessage'
 import {
+  fetchModels,
   getAccessToken,
   streamChatCompletionTokens,
+  uploadImageAsFile,
 } from '@/shared/api/gigachat'
 import type { ChatMessagePayload } from '@/shared/api/gigachat'
 
@@ -20,11 +21,22 @@ const defaultSettings: ChatSettings = {
   systemPrompt: 'Ты полезный ассистент. Отвечай ясно и по делу.',
 }
 
-function messageToPayload(m: ChatMessage): ChatMessagePayload | null {
+async function messageToPayload(
+  m: ChatMessage,
+  accessToken: string,
+  withImages: boolean
+): Promise<ChatMessagePayload | null> {
   if (m.role === 'user') {
+    let attachments: string[] | undefined
+    if (withImages && m.images?.length) {
+      attachments = await Promise.all(
+        m.images.map((img) => uploadImageAsFile(accessToken, img))
+      )
+    }
     return {
       role: 'user',
-      content: buildUserContent(m.content, m.images),
+      content: m.content.trim() || ' ',
+      attachments,
     }
   }
   if (m.role === 'assistant') {
@@ -37,19 +49,41 @@ function messageToPayload(m: ChatMessage): ChatMessagePayload | null {
   return null
 }
 
-function buildCompletionMessages(
+async function buildCompletionMessages(
   systemPrompt: string,
-  history: ChatMessage[]
-): ChatMessagePayload[] {
+  history: ChatMessage[],
+  accessToken: string,
+  latestUserMessageId: string
+): Promise<ChatMessagePayload[]> {
   const out: ChatMessagePayload[] = []
   if (systemPrompt.trim()) {
     out.push({ role: 'system', content: systemPrompt.trim() })
   }
   for (const m of history) {
-    const p = messageToPayload(m)
+    const withImages = m.role === 'user' && m.id === latestUserMessageId
+    const p = await messageToPayload(m, accessToken, withImages)
     if (p) out.push(p)
   }
   return out
+}
+
+function isVisionModel(modelId: string): boolean {
+  return /(vision|multimodal|image|img|vl)/i.test(modelId)
+}
+
+async function resolveModelForRequest(
+  selectedModel: string,
+  hasImages: boolean,
+  accessToken: string
+): Promise<string> {
+  if (!hasImages) return selectedModel
+  if (isVisionModel(selectedModel)) return selectedModel
+  const models = await fetchModels(accessToken)
+  const visionModel = models.find((model) => isVisionModel(model))
+  if (visionModel) return visionModel
+  throw new Error(
+    'Для сообщений с изображением нужна vision-модель. Выбранная модель не поддерживает картинки.'
+  )
 }
 
 interface ChatStoreState {
@@ -212,16 +246,24 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
         (m) => !(m.role === 'assistant' && m.id === assistantId)
       )
 
-      const messagesPayload = buildCompletionMessages(
+      const messagesPayload = await buildCompletionMessages(
         settings.systemPrompt,
-        historyForApi
+        historyForApi,
+        token,
+        userMsg.id
+      )
+      const hasImages = Boolean(userMsg.images?.length)
+      const modelForRequest = await resolveModelForRequest(
+        settings.model,
+        hasImages,
+        token
       )
 
       let acc = ''
       for await (const chunk of streamChatCompletionTokens(
         token,
         {
-          model: settings.model,
+          model: modelForRequest,
           messages: messagesPayload,
           temperature: settings.temperature,
           top_p: settings.topP,
